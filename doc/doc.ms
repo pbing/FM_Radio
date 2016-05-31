@@ -4,7 +4,8 @@
 delim $$
 .EN
 .NH
-Design paramters
+Design parameters
+.LP
 .TS
 center allbox tab(;);
 cb cb cb cb cb cb
@@ -12,7 +13,7 @@ l c c c c l.
 parameter   ; min. ; typ. ; max.  ; unit ; comment
 $f sub c$   ; 87.5 ;      ; 108.5 ; MHz  ; broadcast carrier frequency
 $ Delta f$  ;      ;      ; 75    ; kHz  ; frequency deviation
-$B$         ;      ; 210  ;       ; kHz  ; channel bandwidth
+$B$         ;      ; 210  ;       ; kHz  ; baseband bandwidth
 $f sub m$   ; 0.03 ;      ; 15    ; kHz  ; modulation frequency
 $f sub s$   ;      ; 240  ;       ; MHz  ; sampling frequency
 $f sub b$   ;      ; 1    ;       ; MHz  ; base band clock rate
@@ -53,15 +54,15 @@ Baseband filter
 The baseband filter is composed of a cascaded integrator-comb (CIC)
 filter. The first zero is $f sub c / M$ where $M$ is the decimation
 factor of the CIC filter.  The baseband bandwith should be larger than
-$B$ but less than 400\~kHz.
+$B$ but less than $2 cdot 400~roman kHz$.
 .NH 2
 Downsampling to audio sample rate
 .LP
 A third order CIC decimator will convert from baseband sample rate to
 audio sample rate.  This will effectively remove any frequencies above
-15\~kHz, e.g. encoded stereo and RDS signals.  Because no
-sinc-correction has been made yet, the transfer function will drop at
-higher audio frequencies.
+15\~kHz, e.g. MPX and RDS signals.  Because no sinc-correction has
+been made yet, the transfer function will drop at higher audio
+frequencies.
 .NH 2
 De-emphasis
 .LP
