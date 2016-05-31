@@ -3,6 +3,8 @@
 .EQ
 delim $$
 .EN
+.NH
+Design paramters
 .TS
 center allbox tab(;);
 cb cb cb cb cb cb
@@ -11,9 +13,9 @@ parameter   ; min. ; typ. ; max.  ; unit ; comment
 $f sub c$   ; 87.5 ;      ; 108.5 ; MHz  ; broadcast carrier frequency
 $ Delta f$  ;      ;      ; 75    ; kHz  ; frequency deviation
 $B$         ;      ; 210  ;       ; kHz  ; channel bandwidth
-$f sub m$ ; 0.03 ;      ; 15    ; kHz  ; modulation frequency
+$f sub m$   ; 0.03 ;      ; 15    ; kHz  ; modulation frequency
 $f sub s$   ;      ; 240  ;       ; MHz  ; sampling frequency
-$f sub b$   ;      ; 1    ;       ; MHz  ; base band clock rate    
+$f sub b$   ;      ; 1    ;       ; MHz  ; base band clock rate
 $f sub DAC$ ; 32   ;      ; 48    ; kHz  ; output clock rate for DAC
 $tau$       ;      ; 50   ;       ; µs   ; de-emphasis time constant (Europe)
 .TE
@@ -34,6 +36,37 @@ B lineup > 2 ( Delta f + 2 cdot f sub m ) ~~~~roman "Carson's bandwidth rule"
 .EQ
 f sub b lineup > B
 .EN
-
-
-
+.NH
+Theory of operation
+.NH 2
+Downsampling to I/Q baseband
+.LP
+The I/Q modulator works with 1-bit signals \*- for ADC input and for
+the modulation signal.  The multiply operation is performed by a
+simple XOR logic.
+.LP
+As a result, the baseband signal is a triangular wave instead of a
+sine which will lead to harmonic distorsion.
+.NH 2
+Baseband filter
+.LP
+The baseband filter is composed of a cascaded integrator-comb (CIC)
+filter. The first zero is $f sub c / M$ where $M$ is the decimation
+factor of the CIC filter.  The baseband bandwith should be larger than
+$B$ but less than 400\~kHz.
+.NH 2
+Downsampling to audio sample rate
+.LP
+A third order CIC decimator will convert from baseband sample rate to
+audio sample rate.  This will effectively remove any frequencies above
+15\~kHz, e.g. encoded stereo and RDS signals.  Because no
+sinc-correction has been made yet, the transfer function will drop at
+higher audio frequencies.
+.NH 2
+De-emphasis
+.LP
+A de-emphasis filter with the transfer function
+.EQ
+H(s) = 1 over {1 + tau cdot s}
+.EN
+will correct the pre-emphased audio signal of the broadcast station.
