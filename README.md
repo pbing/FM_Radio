@@ -1,5 +1,12 @@
 # Simple FPGA only FM Radio
 
+## Installation
+```shell
+git clone https://github.com/pbing/FM_Radio.git
+cd FM_Radio
+git submodule update --init
+```
+
 ## Status
 
 - Initial commit.
