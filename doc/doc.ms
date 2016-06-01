@@ -13,10 +13,10 @@ l c c c c l.
 parameter   ; min. ; typ. ; max.  ; unit ; comment
 $f sub c$   ; 87.5 ;      ; 108.5 ; MHz  ; broadcast carrier frequency
 $ Delta f$  ;      ;      ; 75    ; kHz  ; frequency deviation
-$B$         ;      ; 210  ;       ; kHz  ; baseband bandwidth
+$B$         ;      ; 210  ;       ; kHz  ; base-band bandwidth
 $f sub m$   ; 0.03 ;      ; 15    ; kHz  ; modulation frequency
 $f sub s$   ;      ; 240  ;       ; MHz  ; sampling frequency
-$f sub b$   ;      ; 1    ;       ; MHz  ; base band clock rate
+$f sub b$   ;      ; 1    ;       ; MHz  ; base-band clock rate
 $f sub DAC$ ; 32   ;      ; 48    ; kHz  ; output clock rate for DAC
 $tau$       ;      ; 50   ;       ; µs   ; de-emphasis time constant (Europe)
 .TE
@@ -40,25 +40,25 @@ f sub b lineup > B
 .NH
 Theory of operation
 .NH 2
-Downsampling to I/Q baseband
+Downsampling to I/Q base-band
 .LP
 The I/Q modulator works with 1-bit signals \*- for ADC input and for
 the modulation signal.  The multiply operation is performed by a
 simple XOR logic.
 .LP
-As a result, the baseband signal is a triangular wave instead of a
+As a result, the base-band signal is a triangular wave instead of a
 sine which will lead to harmonic distorsion.
 .NH 2
-Baseband filter
+Base-band filter
 .LP
-The baseband filter is composed of a cascaded integrator-comb (CIC)
+The base-band filter is composed of a cascaded integrator-comb (CIC)
 filter. The first zero is $f sub c / M$ where $M$ is the decimation
-factor of the CIC filter.  The baseband bandwith should be larger than
-$B$ but less than $2 cdot 400~roman kHz$.
+factor of the CIC filter.  The base-band bandwith should be larger than
+$B$.  For optimal channel separation $B$ should be less than 400\ kHz.
 .NH 2
 Downsampling to audio sample rate
 .LP
-A third order CIC decimator will convert from baseband sample rate to
+A third order CIC decimator will convert from base-band sample rate to
 audio sample rate.  This will effectively remove any frequencies above
 15\~kHz, e.g. MPX and RDS signals.  Because no sinc-correction has
 been made yet, the transfer function will drop at higher audio
