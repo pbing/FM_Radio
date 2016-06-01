@@ -21,6 +21,10 @@ module radio_core
    wire signed [width_cordic - 1:0]     differentiator_out; // differentiator output
    wire signed [width_cordic + $clog2(M2**3) - 1:0] demodulated_f; // filtered demodulated
 
+   /**************************************************
+    * DDS
+    **************************************************/
+
    dds
      #(.width(width_dds))
    inst_dds
@@ -28,6 +32,10 @@ module radio_core
       .clk(clk_s),
       .K,
       .phase);
+
+   /**************************************************
+    * Carrier to I/Q conversion
+    **************************************************/
 
    synchronizer sync_adc
      (.reset,
@@ -41,6 +49,10 @@ module radio_core
       .phase(phase[$left(phase)-:2]),
       .I,
       .Q);
+
+   /**************************************************
+    * Base-band filters
+    **************************************************/
 
    cic_3_filter
      #(.M    (M1),
@@ -62,10 +74,14 @@ module radio_core
       .in     (Q),
       .out    (Qf));
 
+   /**************************************************
+    * Frequency detector
+    **************************************************/
+
    /* Connect x0/y0 with double magnitude of If/Qf in order to
-   /* compensate the conversion gain of 1/2.
-    * This improves the S/N ratio of the CORDIC unit.
-    */
+    /* compensate the conversion gain of 1/2.
+     * This improves the S/N ratio of the CORDIC unit.
+     */
    cordic
      #(.vectoring(1),
        .width    (width_cordic))
@@ -86,6 +102,10 @@ module radio_core
       .clk(clk_b),
       .in(cordic_phase),
       .out(differentiator_out));
+
+   /**************************************************
+    * Audio filters
+    **************************************************/
 
    cic_3_filter
      #(.M    (M2),
