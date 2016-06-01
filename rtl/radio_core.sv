@@ -62,14 +62,18 @@ module radio_core
       .in     (Q),
       .out    (Qf));
 
+   /* Connect x0/y0 with double magnitude of If/Qf in order to
+   /* compensate the conversion gain of 1/2.
+    * This improves the S/N ratio of the CORDIC unit.
+    */
    cordic
      #(.vectoring(1),
        .width    (width_cordic))
    inst_cordic
      (.reset,
       .clk(clk_b),
-      .x0 (If[$left(If) -: width_cordic]),
-      .y0 (Qf[$left(Qf) -: width_cordic]),
+      .x0 (If[$left(If) - 1 -: width_cordic]),
+      .y0 (Qf[$left(Qf) - 1 -: width_cordic]),
       .z0 ('0),
       .x  (/*open*/),
       .y  (/*open*/),
