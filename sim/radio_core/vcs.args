@@ -1,0 +1,8 @@
+-sverilog
+-debug_all
+-timescale=1ns/1fs
++libext+.sv
++incdir+../../../CORDIC/rtl/
+-y ../../../CORDIC/rtl/
+-y ../../rtl/
+
