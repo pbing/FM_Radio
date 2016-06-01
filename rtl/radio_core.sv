@@ -6,9 +6,9 @@ module radio_core
     parameter M1           = 250,                           // carrier to broad-band frequency ratio
     parameter M2           = 30)                            // broad-band to audio frequency ratio
    (input  wire                             reset,          // reset
-    input  wire                             clk_s,          // sampling clock
-    input  wire                             clk_b,          // base-band clock
-    input  wire                             clk_a,          // audio clock
+    input  wire                             clk_s,          // 240 MHz sampling clock
+    input  wire                             clk_b,          // 960 kHz base-band clock
+    input  wire                             clk_a,          //  32 kHz audio clock
     input  wire                             adc,            // broadcast signal from 1-bit ADC
     input  wire        [width_dds - 1:0]    K,              // phase constant for DDS
     output wire signed [15:0]               demodulated);   // demodulated signal
@@ -117,5 +117,6 @@ module radio_core
       .in     (differentiator_out),
       .out    (demodulated_f));
 
-   assign demodulated = demodulated_f[$left(demodulated_f) : 16];
+   /* Compensate gain loss by multiplication with four. */
+   assign demodulated = demodulated_f[$left(demodulated_f) - 2 -: 16];
 endmodule
