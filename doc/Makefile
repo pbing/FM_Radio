@@ -2,5 +2,9 @@
 
 all: doc.pdf
 
-%.pdf : %.ms
-	groff -ms -e -t $< | pstopdf -i -o $@
+%.pdf : %.ps
+	ps2pdf $< $@
+#	pstopdf -i $< -o $@
+
+%.ps : %.ms
+	groff -et -ms $< > $@
