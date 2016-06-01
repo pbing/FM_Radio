@@ -14,7 +14,7 @@ module radio_core
     output wire signed [15:0]               demodulated);   // demodulated signal
 
    wire                                 adc_s;              // synchronized broadcast signal from 1-bit ADC
-   bit  signed [width_dds - 1:0]        phase;              // DDS phase
+   wire signed [width_dds - 1:0]        phase;              // DDS phase
    wire signed [1:0]                    I, Q;               // I/Q
    wire signed [2 + $clog2(M1**3) - 1:0] If, Qf;            // filtered I/Q
    wire signed [width_cordic - 1:0]     cordic_phase;       // CORDIC phase
