@@ -1,14 +1,14 @@
 /* Generic clock divider */
 
 module clock_divider
-  #(parameter M)        // divider ratio
+  #(parameter M)         // divider ratio
    (input  wire  reset,  // reset
     input  wire  clk,    // input clock
     output logic clk_o); // output clock
 
    logic [$clog2(M) - 1 : 0] counter;
 
-   always_ff @(posedge clk_s or posedge reset)
+   always_ff @(posedge clk_o or posedge reset)
      if (reset)
        begin
           counter <= '0;
