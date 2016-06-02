@@ -27,7 +27,7 @@ module cic_3_filter
        end
 
    /* differentiator section */
-   always @(posedge clk_out or posedge reset)
+   always_ff @(posedge clk_out or posedge reset)
      if (reset)
        begin
           d_dif[0] <= '0;
