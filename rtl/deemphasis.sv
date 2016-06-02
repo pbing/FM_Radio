@@ -12,12 +12,12 @@ module deemphasis
     input  wire  signed [width - 1:0] in,    // input
     output logic signed [width - 1:0] out);  // filtered result
 
-   const real a = $exp(-(1.0 / (50.0e-6 * 32.0e3))),
-              b = 1.0 - a;
+   const real a = -$exp(-(1.0 / (50.0e-6 * 32.0e3))),
+              b = 1.0 + a;
 
    always_ff @(posedge clk or posedge reset)
      if (reset)
        out <= '0;
      else
-       out <= out * a + in * b;
+       out <= b * in - a * out;
 endmodule
