@@ -4,28 +4,23 @@ module tb_cru;
    timeunit 1ns;
    timeprecision 1ps;
 
-   localparam M1 = 250; // carrier to broad-band frequency ratio
-   localparam M2 = 30;  // broad-band to audio frequency ratio
+   const real tclk240m = 1s / 240.0e6;
 
-   const real tclk_s = 1s / 240.0e6;
+   bit  reset_in; // power-on reset
+   wire rst240m;  // 240 MHz clock domain
+   wire rst12m;   //  12 MHz clock domain
+   wire rst960k;  // 960 kHz clock domain
+   wire rst32k;   // 32 kHz clock domain
 
-   bit  reset_in;    // external reset
-   bit  clk_s;       // 240 MHz sampling clock
-   wire clk_b;       // 960 kHz base-band clock
-   wire clk_a;       // 32 kHz audio clock
-   wire reset_out_s; // reset sampling clock domain
-   wire reset_out_b; // reset base-band clock domain
-   wire reset_out_a; // audio clock domain
+   bit  clk240m;  // 240 MHz clock
+   wire clk12m;   //  12 MHz clock
+   wire clk2m;    //   2 MHz clock
+   wire clk960k;  // 960 kHz clock
+   wire clk32k;   //  32 kHz clock
 
-   clock_unit
-     #(.M1(M1), .M2(M2))
-   cu
-     (.reset(reset_out_s),
-      .*);
+   cru dut(.*);
 
-   reset_unit ru(.*);
-
-   always #(tclk_s/2) clk_s = ~clk_s;
+   always #(tclk240m/2) clk240m = ~clk240m;
 
    initial
      begin:main
@@ -33,8 +28,6 @@ module tb_cru;
         #10ns;
         reset_in = 1'b0;
 
-        repeat (10 * M1 * M2) @(posedge clk_s);
-
-        #100us $finish;
+        #300us $finish;
      end:main
 endmodule

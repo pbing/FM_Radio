@@ -8,7 +8,7 @@ module clock_divider
 
    logic [$clog2(M) - 1 : 0] counter;
 
-   always_ff @(posedge clk_o or posedge reset)
+   always_ff @(posedge clk or posedge reset)
      if (reset)
        begin
           counter <= '0;
