@@ -33,7 +33,7 @@ module tb_cru;
         #10ns;
         reset_in = 1'b0;
 
-        repeat (10 * M1 * M2) @(negedge clk_s);
+        repeat (10 * M1 * M2) @(posedge clk_s);
 
         #100us $finish;
      end:main
