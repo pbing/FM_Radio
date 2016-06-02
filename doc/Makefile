@@ -4,7 +4,7 @@ all: doc.pdf
 
 %.pdf : %.ps
 	ps2pdf $< $@
-#	pstopdf -i $< -o $@
+#	pstopdf $< -o $@
 
 %.ps : %.ms
 	groff -et -ms $< > $@
