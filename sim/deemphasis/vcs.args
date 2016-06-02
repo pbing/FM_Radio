@@ -1,0 +1,4 @@
+-sverilog
+-debug_all
+-timescale=1ns/1fs
+../../rtl/deemphasis.sv

@@ -1,17 +1,19 @@
 /* De-emphasis low-pass filter with 50 µs time constant.
  * Pipelined.
- * 
+ *
  * Implemented with impulse invariant method.
  */
 
+/* FIXME: Create RTL model. */
 module deemphasis
   #(parameter width)
-  (input  wire               reset, // reset
-   input  wire               clk,   // clock
-   input  wire [width - 1:0] in,    // input
-   output wire [width - 1:0] out);  // filtered result
+   (input  wire                       reset, // reset
+    input  wire                       clk,   // clock
+    input  wire  signed [width - 1:0] in,    // input
+    output logic signed [width - 1:0] out);  // filtered result
 
-   const real a = 0.535261, b = 0.464739;
+   const real a = $exp(-(1.0 / (50.0e-6 * 32.0e3))),
+              b = 1.0 - a;
 
    always_ff @(posedge clk or posedge reset)
      if (reset)

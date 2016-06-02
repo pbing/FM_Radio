@@ -1,4 +1,3 @@
-.\" -*- coding: utf-8 -*-
 .\" .nr PS 12
 .EQ
 delim $$
@@ -43,8 +42,8 @@ Theory of operation
 Downsampling to I/Q base-band
 .LP
 The I/Q modulator works with 1-bit signals \*- for ADC input and for
-the modulation signal.  The multiply operation is performed by a
-simple XOR logic.
+the modulation signal.
+The multiply operation is performed by a simple XOR logic.
 .LP
 As a result, the base-band signal is a triangular wave instead of a
 sine which will lead to harmonic distorsion.
@@ -52,17 +51,21 @@ sine which will lead to harmonic distorsion.
 Base-band filter
 .LP
 The base-band filter is composed of a cascaded integrator-comb (CIC)
-filter. The first zero is $f sub c / M$ where $M$ is the decimation
-factor of the CIC filter.  The base-band bandwith should be larger than
-$B$.  For optimal channel separation $B$ should be less than 400\ kHz.
+filter.
+The first zero is $f sub c / M$ where $M$ is the decimation
+factor of the CIC filter.
+The base-band bandwith should be larger than
+$B$.
+For optimal channel separation $B$ should be less than 400\ kHz.
 .NH 2
 Downsampling to audio sample rate
 .LP
-A third order CIC decimator will convert from base-band sample rate to
-audio sample rate.  This will effectively remove any frequencies above
-15\~kHz, e.g. MPX and RDS signals.  Because no sinc-correction has
-been made yet, the transfer function will drop at higher audio
-frequencies.
+A third order CIC decimator converts from base-band sample rate to
+audio sample rate.
+This effectively removes any frequencies above 15\ kHz, e.g. MPX
+and RDS signals.
+Because no sinc-correction has been made yet, the transfer function
+will drop at higher audio frequencies.
 .NH 2
 De-emphasis
 .LP
@@ -70,4 +73,4 @@ A de-emphasis filter with the transfer function
 .EQ
 H(s) = 1 over {1 + tau cdot s}
 .EN
-will correct the pre-emphased audio signal of the broadcast station.
+corrects the pre-emphased audio signal of the broadcast station.
