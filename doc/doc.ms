@@ -72,7 +72,7 @@ H(s) = 1 over {1 + tau cdot s}
 .EN
 corrects the pre-emphased audio signal of the broadcast station.
 .LP
-Impulse invariance samples $H(s)$ to $H(z)$.
+Impulse invariance method converts $H(s)$ to $H(z)$.
 .EQ
 H(z) mark = b over {1 + a cdot z sup {-1}}
 .EN
