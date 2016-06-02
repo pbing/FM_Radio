@@ -25,16 +25,13 @@ The following constraints have to be fullfilled.
 f sub s mark > 2 cdot f sub c
 .EN
 .EQ
-f sub s lineup > 2 cdot pi cdot f sub m
-.EN
-.EQ
-f sub DAC lineup > 2 cdot f sub m
-.EN
-.EQ
 B lineup > 2 ( Delta f + 2 cdot f sub m ) ~~~~roman "Carson's bandwidth rule"
 .EN
 .EQ
 f sub b lineup > B
+.EN
+.EQ
+f sub DAC lineup > 2 cdot f sub m
 .EN
 .NH
 Theory of operation
@@ -74,3 +71,14 @@ A de-emphasis filter with the transfer function
 H(s) = 1 over {1 + tau cdot s}
 .EN
 corrects the pre-emphased audio signal of the broadcast station.
+.LP
+Impulse invariance samples $H(s)$ to $H(z)$.
+.EQ
+H(z) mark = b over {1 + a cdot z sup {-1}}
+.EN
+.EQ
+a lineup = - e sup {- ^ {1 over {tau cdot f sub DAC}}}
+.EN
+.EQ
+b lineup = 1 + a
+.EN
