@@ -3,12 +3,12 @@
 module radio_core
   #(parameter width_dds    = 32,                            // DDS accumulator width
     parameter width_cordic = 17,                            // CORDIC width
-    parameter M1           = 250,                           // carrier to broad-band frequency ratio
-    parameter M2           = 30)                            // broad-band to audio frequency ratio
+    parameter R1           = 250,                           // carrier to broad-band frequency ratio
+    parameter R2           = 30)                            // broad-band to audio frequency ratio
    (input  wire                             reset,          // reset
-    input  wire                             clk_s,          // 240 MHz sampling clock
-    input  wire                             clk_b,          // 960 kHz base-band clock
-    input  wire                             clk_a,          //  32 kHz audio clock
+    input  wire                             clk,            // clock
+    input  wire                             en_b,           // 960 kHz base-band clock enable
+    input  wire                             en_a,           //  32 kHz audio clock enable
     input  wire                             adc,            // broadcast signal from 1-bit ADC
     input  wire        [width_dds - 1:0]    K,              // phase constant for DDS
     output wire signed [15:0]               demodulated);   // demodulated signal
@@ -16,10 +16,10 @@ module radio_core
    wire                                 adc_s;              // synchronized broadcast signal from 1-bit ADC
    wire signed [width_dds - 1:0]        phase;              // DDS phase
    wire signed [1:0]                    I, Q;               // I/Q
-   wire signed [2 + $clog2(M1**3) - 1:0] If, Qf;            // filtered I/Q
+   wire signed [2 + $clog2(R1**3) - 1:0] If, Qf;            // filtered I/Q
    wire signed [width_cordic - 1:0]     cordic_phase;       // CORDIC phase
    wire signed [width_cordic - 1:0]     differentiator_out; // differentiator output
-   wire signed [width_cordic + $clog2(M2**3) - 1:0] demodulated_f; // filtered demodulated
+   wire signed [width_cordic + $clog2(R2**3) - 1:0] demodulated_f; // filtered demodulated
 
    /**************************************************
     * DDS
@@ -29,7 +29,7 @@ module radio_core
      #(.width(width_dds))
    inst_dds
      (.reset,
-      .clk(clk_s),
+      .clk(clk),
       .K,
       .phase);
 
@@ -39,12 +39,12 @@ module radio_core
 
    synchronizer sync_adc
      (.reset,
-      .clk(clk_s),
+      .clk(clk),
       .in (adc),
       .out(adc_s));
 
    iq_modulator inst_iq_modulator
-     (.clk  (clk_s),
+     (.clk  (clk),
       .adc  (adc_s),
       .phase(phase[$left(phase)-:2]),
       .I,
@@ -55,39 +55,42 @@ module radio_core
     **************************************************/
 
    cic_3_filter
-     #(.M    (M1),
+     #(.R    (R1),
        .width(2))
    filter_I
      (.reset,
-      .clk_in (clk_s),
-      .clk_out(clk_b),
-      .in     (I),
-      .out    (If));
+      .clk   (clk),
+      .en_in (1'b1),
+      .en_out(en_b),
+      .in    (I),
+      .out   (If));
 
    cic_3_filter
-     #(.M    (M1),
+     #(.R    (R1),
        .width(2))
    filter_Q
      (.reset,
-      .clk_in (clk_s),
-      .clk_out(clk_b),
-      .in     (Q),
-      .out    (Qf));
+      .clk   (clk),
+      .en_in (1'b1),
+      .en_out(en_b),
+      .in    (Q),
+      .out   (Qf));
 
    /**************************************************
     * Frequency detector
     **************************************************/
 
    /* Connect x0/y0 with double magnitude of If/Qf in order to
-    /* compensate the conversion gain of 1/2.
-     * This improves the S/N ratio of the CORDIC unit.
-     */
+    * compensate the conversion gain of 1/2.
+    * This improves the S/N ratio of the CORDIC unit.
+    */
    cordic
      #(.vectoring(1),
        .width    (width_cordic))
    inst_cordic
      (.reset,
-      .clk(clk_b),
+      .clk(clk),
+      .en(en_b),
       .x0 (If[$left(If) - 1 -: width_cordic]),
       .y0 (Qf[$left(Qf) - 1 -: width_cordic]),
       .z0 ('0),
@@ -99,7 +102,8 @@ module radio_core
      #(.width(width_cordic))
    inst_differentiator
      (.reset,
-      .clk(clk_b),
+      .clk(clk),
+      .en(en_b),
       .in(cordic_phase),
       .out(differentiator_out));
 
@@ -108,14 +112,15 @@ module radio_core
     **************************************************/
 
    cic_3_filter
-     #(.M    (M2),
+     #(.R    (R2),
        .width(width_cordic))
    filter_audio
      (.reset,
-      .clk_in (clk_b),
-      .clk_out(clk_a),
-      .in     (differentiator_out),
-      .out    (demodulated_f));
+      .clk   (clk),
+      .en_in (en_b),
+      .en_out(en_a),
+      .in    (differentiator_out),
+      .out   (demodulated_f));
 
    /* Compensate gain loss by multiplication with four. */
    assign demodulated = demodulated_f[$left(demodulated_f) - 2 -: 16];
