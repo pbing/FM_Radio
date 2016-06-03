@@ -3,6 +3,7 @@
 module synchronizer
   (input  wire reset, // reset
    input  wire clk,   // clock
+   input  wire en,    // clock enable
    input  wire in,    // input
    output wire out);  // synchronized output
 
@@ -12,7 +13,8 @@ module synchronizer
      if (reset)
        sync <= '0;
      else
-       sync <= {in, sync[1 : $right(sync) - 1]};
+       if (en)
+         sync <= {in, sync[1 : $right(sync) - 1]};
 
    assign out = sync[3];
 endmodule

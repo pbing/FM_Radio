@@ -8,15 +8,13 @@ module tb_cru;
 
    bit  reset_in; // power-on reset
    wire rst240m;  // 240 MHz clock domain
-   wire rst12m;   //  12 MHz clock domain
    wire rst960k;  // 960 kHz clock domain
    wire rst32k;   // 32 kHz clock domain
 
    bit  clk240m;  // 240 MHz clock
-   wire clk12m;   //  12 MHz clock
-   wire clk2m;    //   2 MHz clock
-   wire clk960k;  // 960 kHz clock
-   wire clk32k;   //  32 kHz clock
+
+   wire en960k;   // 960 kHz clock
+   wire en32k;    //  32 kHz clock
 
    cru dut(.*);
 
