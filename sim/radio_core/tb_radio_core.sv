@@ -49,23 +49,22 @@ module tb_radio_core;
      begin:clk_gen2
         int counter;
 
-        if (en_b)
-          if (counter == R2 - 1)
-            begin
-               counter <= 0;
-               en_a    <= 1'b1;
-            end
-          else
-            begin
-               counter <= counter + 1;
-               en_a    <= 1'b0;
-            end
+        if (counter == R1 * R2 - 1)
+          begin
+             counter <= 0;
+             en_a    <= 1'b1;
+          end
+        else
+          begin
+             counter <= counter + 1;
+             en_a    <= 1'b0;
+          end
      end:clk_gen2
 
 
    initial
      begin:main
-        K = 2.0**32 * tc / tclk; // tune to carrier frequency
+        K = 2.0**32 * tclk / tc; // tune to carrier frequency
 
         reset = 1'b1;
         @(negedge clk);
