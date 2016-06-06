@@ -6,15 +6,13 @@ module tb_cru;
 
    const real tclk240m = 1s / 240.0e6;
 
-   bit  reset_in; // power-on reset
-   wire rst240m;  // 240 MHz clock domain
-   wire rst960k;  // 960 kHz clock domain
-   wire rst32k;   // 32 kHz clock domain
+   bit  reset_in;  // power-on reset
+   wire reset_out; // synchronized reset
 
-   bit  clk240m;  // 240 MHz clock
+   bit  clk240m;   // 240 MHz clock
 
-   wire en960k;   // 960 kHz clock
-   wire en32k;    //  32 kHz clock
+   wire en960k;    // 960 kHz clock
+   wire en32k;     //  32 kHz clock
 
    cru dut(.*);
 
