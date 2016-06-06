@@ -8,6 +8,8 @@ module tb_radio_core;
    localparam width_dds    = 32;                  // DDS accumulator width
    localparam width_cordic = 17;                  // CORDIC width
    localparam R1           = 250;                 // carrier to broad-band frequency ratio
+   localparam R1a          = 5;                   // first CIC filter stage
+   localparam R1b          = R1 / 5;              // second CIC filter stage
    localparam R2           = 30;                  // broad-band to audio frequency ratio
 
    const realtime fdev = 75.0e3,                  // frequency deviation
@@ -18,6 +20,7 @@ module tb_radio_core;
 
    bit                              reset;        // reset
    bit                              clk;          // clock
+   bit                              en1;          //  48 MHz first CIC filter clock enable
    bit                              en_b;         // 960 kHz base-band clock enable
    bit                              en_a ;        //  32 kHz audio clock enable
    bit                              adc;          // broadcast signal from 1-bit ADC
@@ -33,7 +36,23 @@ module tb_radio_core;
      begin:clk_gen1
         int counter;
 
-        if (counter == R1 - 1)
+        if (counter == R1a - 1)
+          begin
+             counter <= 0;
+             en1     <= 1'b1;
+          end
+        else
+          begin
+             counter <= counter + 1;
+             en1     <= 1'b0;
+          end
+     end:clk_gen1
+
+   always @(posedge clk)
+     begin:clk_gen2
+        int counter;
+
+        if (counter == R1a * R1b - 1)
           begin
              counter <= 0;
              en_b    <= 1'b1;
@@ -43,10 +62,10 @@ module tb_radio_core;
              counter <= counter + 1;
              en_b    <= 1'b0;
           end
-     end:clk_gen1
+     end:clk_gen2
 
    always @(posedge clk)
-     begin:clk_gen2
+     begin:clk_gen3
         int counter;
 
         if (counter == R1 * R2 - 1)
@@ -59,7 +78,7 @@ module tb_radio_core;
              counter <= counter + 1;
              en_a    <= 1'b0;
           end
-     end:clk_gen2
+     end:clk_gen3
 
 
    initial

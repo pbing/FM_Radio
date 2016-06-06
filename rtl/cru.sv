@@ -6,6 +6,7 @@ module cru
 
    input  wire clk240m,   // 240 MHz clock
 
+   output wire en48m,     //  48 MHz clock enable
    output wire en960k,    // 960 kHz clock enable
    output wire en32k);    //  32 kHz clock enable
 
@@ -23,11 +24,19 @@ module cru
 
    /* base-band clock */
    clock_divider
-     #(.M(250))
-   inst_clk960k
+     #(.M(5))
+   inst_clk48m
      (.reset(reset_out),
       .clk  (clk240m),
       .en_i (1'b1),
+      .en_o (en48m));
+
+   clock_divider
+     #(.M(50))
+   inst_clk960k
+     (.reset(reset_out),
+      .clk  (clk240m),
+      .en_i (en48m),
       .en_o (en960k));
 
    /* audio clock */

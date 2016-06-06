@@ -11,6 +11,7 @@ module tb_cru;
 
    bit  clk240m;   // 240 MHz clock
 
+   wire en48m;     //  48 MHz clock
    wire en960k;    // 960 kHz clock
    wire en32k;     //  32 kHz clock
 
