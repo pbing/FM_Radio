@@ -100,17 +100,12 @@ module CII_Starter_TOP
    inout  wire [35:0] GPIO_0,      // GPIO Connection 0
    inout  wire [35:0] GPIO_1);     // GPIO Connection 1
 
-   wire reset_in; // power-on reset
-   wire rst240m;  // 240 MHz clock domain
-   wire rst12m;   //  12 MHz clock domain
-   wire rst960k;  // 960 kHz clock domain
-   wire rst32k;   //  32 kHz clock domain
-
-   wire clk240m, clk240m_b;  // 240 MHz clock
-   wire clk12m,  clk12m_b;   //  12 MHz clock
-   wire clk2m,   clk2m_b;    //   2 MHz clock
-   wire clk960k, clk960k_b;  // 960 kHz clock
-   wire clk32k,  clk32k_b;   //  32 kHz clock
+   wire reset_in;  // power-on reset
+   wire reset_out; // synchronized reset
+   wire clk240m;   // 240 MHz clock
+   wire en48m;     //  48 MHz clock enable
+   wire en960k;    // 960 kHz clock enable
+   wire en32k;     //  32 kHz clock enable
 
    const bit [31:0] K = 2**32 * 100.0e6 / 240.0e6;
 
@@ -120,25 +115,18 @@ module CII_Starter_TOP
 
    cru inst_cru(.*);
 
-   clkbuf clkbuf240m(.inclk(clk240m),
-	             .outclk(clk240m_b));
-
-   clkbuf clkbuf960k(.inclk(clk960k),
-	             .outclk(clk960k_b));
-
-   clkbuf clkbuf32k(.inclk(clk32k),
-	            .outclk(clk32k_b));
 
    radio_core
      #(.width_dds   (32),
        .width_cordic(17),
-       .M1          (250),
-       .M2          (30))
+       .R1          (250),
+       .R2          (30))
    inst_radio_core
-     (.reset       (rst240m),
-      .clk_s       (clk240m_b),
-      .clk_b       (clk960k_b),
-      .clk_a       (clk32k_b),
+     (.reset       (reset_out),
+      .clk         (clk240m),
+      .en1         (en48m),
+      .en_b        (en960k),
+      .en_a        (en32k),
       .adc         (GPIO_0[0]), // FIXME
       .K           (K),
       .demodulated (GPIO_1[15:0])); // FIXME
