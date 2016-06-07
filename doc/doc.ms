@@ -15,8 +15,8 @@ $ Delta f$  ;      ;      ; 75    ; kHz  ; frequency deviation
 $B$         ;      ; 210  ;       ; kHz  ; base-band bandwidth
 $f sub m$   ; 0.03 ;      ; 15    ; kHz  ; modulation frequency
 $f sub s$   ;      ; 240  ;       ; MHz  ; sampling frequency
-$f sub b$   ;      ; 1    ;       ; MHz  ; base-band clock rate
-$f sub DAC$ ; 32   ;      ; 48    ; kHz  ; output clock rate for DAC
+$f sub b$   ;      ; 960  ;       ; kHz  ; base-band clock rate
+$f sub DAC$ ; 32   ;      ;       ; kHz  ; output clock rate for DAC
 $tau$       ;      ; 50   ;       ; µs   ; de-emphasis time constant (Europe)
 .TE
 .LP
@@ -25,7 +25,7 @@ The following constraints have to be fullfilled.
 f sub s mark > 2 cdot f sub c
 .EN
 .EQ
-B lineup > 2 ( Delta f + 2 cdot f sub m ) ~~~~roman "Carson's bandwidth rule"
+B lineup > 2 cdot ( Delta f + 2 cdot f sub m ) ~~~~ roman "Carson's bandwidth rule"
 .EN
 .EQ
 f sub b lineup > B
@@ -47,13 +47,15 @@ sine which will lead to harmonic distorsion.
 .NH 2
 Base-band filter
 .LP
-The base-band filter is composed of a cascaded integrator-comb (CIC)
-filter.
-The first zero is $f sub c / M$ where $M$ is the decimation
+The base-band filter is compromised of two third order cascaded
+integrator-comb (CIC) filters.
+After the first filter the data rate is 48\ MHz, after the second
+filter 960\ kHz.
+The first zero is $f sub c / R$ where $R$ is the decimation
 factor of the CIC filter.
-The base-band bandwith should be larger than
-$B$.
-For optimal channel separation $B$ should be less than 400\ kHz.
+.LP
+The base-band bandwith should be larger than $B$.
+For optimal channel separation it should be less than 400\ kHz.
 .NH 2
 Downsampling to audio sample rate
 .LP
