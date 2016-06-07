@@ -100,35 +100,61 @@ module CII_Starter_TOP
    inout  wire [35:0] GPIO_0,      // GPIO Connection 0
    inout  wire [35:0] GPIO_1);     // GPIO Connection 1
 
-   wire reset_in;  // power-on reset
-   wire reset_out; // synchronized reset
-   wire clk240m;   // 240 MHz clock
-   wire en48m;     //  48 MHz clock enable
-   wire en960k;    // 960 kHz clock enable
-   wire en32k;     //  32 kHz clock enable
+   localparam width_dds = 32;
 
-   const bit [31:0] K = 2**32 * 100.0e6 / 240.0e6;
+   wire                     reset_in;   // power-on reset
+   wire                     reset_sync; // synchronized reset
+   wire                     clk240m;    // 240 MHz clock
+   wire                     en48m;      //  48 MHz clock enable
+   wire                     en960k;     // 960 kHz clock enable
+   wire                     en32k;      //  32 kHz clock enable
+   wire [width_dds - 1 : 0] K;          // DDS phase reload constant
+   wire [15:0]              audio_dat;  // audio data
 
    assign reset_in = ~KEY[0];
 
-   pll inst_pll(.inclk0(CLOCK_24[0]), .c0(clk240m));
+   pll inst_pll
+     (.inclk0(CLOCK_24[0]),
+      .c0    (clk240m));
 
-   cru inst_cru(.*);
-
+   cru inst_cru
+     (.reset_in,
+      .reset_sync,
+      .clk_240m,
+      .en48m,
+      .en960k,
+      .en32k);
 
    radio_core
-     #(.width_dds   (32),
+     #(.width_dds   (width_dds),
        .width_cordic(17),
        .R1          (250),
        .R2          (30))
    inst_radio_core
-     (.reset       (reset_out),
-      .clk         (clk240m),
-      .en1         (en48m),
-      .en_b        (en960k),
-      .en_a        (en32k),
-      .adc         (GPIO_0[0]), // FIXME
-      .K           (K),
-      .demodulated (GPIO_1[15:0])); // FIXME
+     (.reset        (reset_sync),
+      .clk          (clk240m),
+      .en1          (en48m),
+      .en_b         (en960k),
+      .en_a         (en32k),
+      .adc          (GPIO_0[0]), // FIXME
+      .K,
+      .demodulated  (audio_dat));
 
+   freq_select
+     #(.width_dds(width_dds))
+   inst_freq_select
+     (.SW,
+      .HEX({HEX3, HEX2, HEX1, HEX0}),
+      .K);
+
+   wm8731_controller inst_wm8731_controller
+     (.reset(reset_sync),
+      .clk       (CLOCK_24[1]),
+      .audio_dat,
+      .i2c_scl   (I2C_SCLK),
+      .i2c_sda   (I2C_SDAT),
+      .dac_lr_clk(AUD_DACLRCK),
+      .dac_dat   (AUD_DACDAT),
+      .bclk      (AUD_BCLK),
+      .mclk      (AUD_XCK));
 endmodule
