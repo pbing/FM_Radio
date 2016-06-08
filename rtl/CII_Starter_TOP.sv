@@ -149,7 +149,9 @@ module CII_Starter_TOP
 
    wm8731_controller inst_wm8731_controller
      (.reset(reset_sync),
-      .clk       (CLOCK_24[1]),
+      .clk       (clk240m),
+      .en48m,
+      .en32k,
       .audio_dat,
       .i2c_scl   (I2C_SCLK),
       .i2c_sda   (I2C_SDAT),

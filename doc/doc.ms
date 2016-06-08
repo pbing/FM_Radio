@@ -13,11 +13,13 @@ parameter   ; min. ; typ. ; max.  ; unit ; comment
 $f sub c$   ; 87.5 ;      ; 108.5 ; MHz  ; broadcast carrier frequency
 $ Delta f$  ;      ;      ; 75    ; kHz  ; frequency deviation
 $B$         ;      ; 210  ;       ; kHz  ; base-band bandwidth
+$tau$       ;      ; 50   ;       ; µs   ; de-emphasis time constant (Europe)
 $f sub m$   ; 0.03 ;      ; 15    ; kHz  ; modulation frequency
 $f sub s$   ;      ; 240  ;       ; MHz  ; sampling frequency
 $f sub b$   ;      ; 960  ;       ; kHz  ; base-band clock rate
 $f sub DAC$ ; 32   ;      ;       ; kHz  ; output clock rate for DAC
-$tau$       ;      ; 50   ;       ; µs   ; de-emphasis time constant (Europe)
+$f sub MCLK$;      ;      ; 18.5  ; MHz  ; WM8731 master clock frequency
+$f sub BCLK$;      ;      ; 20    ; MHz  ; WM8731 bit clock frequency
 .TE
 .LP
 The following constraints have to be fullfilled.
@@ -32,6 +34,9 @@ f sub b lineup > B
 .EN
 .EQ
 f sub DAC lineup > 2 cdot f sub m
+.EN
+.EQ
+f sub BCLK lineup >= 2 cdot 16 cdot f sub DAC ~~~~ roman "with 16\ bit audio data"
 .EN
 .NH
 Theory of operation
