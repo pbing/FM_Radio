@@ -13,7 +13,7 @@ parameter   ; min. ; typ. ; max.  ; unit ; comment
 $f sub c$   ; 87.5 ;      ; 108.5 ; MHz  ; broadcast carrier frequency
 $ Delta f$  ;      ;      ; 75    ; kHz  ; frequency deviation
 $B$         ;      ; 210  ;       ; kHz  ; base-band bandwidth
-$tau$       ;      ; 50   ;       ; µs   ; de-emphasis time constant (Europe)
+$tau$       ;      ; 50   ;       ; \(mcs  ; de-emphasis time constant (Europe)
 $f sub m$   ; 0.03 ;      ; 15    ; kHz  ; modulation frequency
 $f sub s$   ;      ; 240  ;       ; MHz  ; sampling frequency
 $f sub b$   ;      ; 960  ;       ; kHz  ; base-band clock rate
