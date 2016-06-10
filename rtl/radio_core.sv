@@ -60,7 +60,7 @@ module radio_core
     * Base-band filters
     **************************************************/
 
-   /* firt stage */
+   /* first stage */
    cic_3_filter
      #(.R    (R1a),
        .width($bits(I)))
@@ -107,7 +107,7 @@ module radio_core
       .out   (Qf2));
 
    /**************************************************
-    * Frequency detector
+    * Frequency discriminator
     **************************************************/
 
    /* Connect x0/y0 with double magnitude of If/Qf in order to
