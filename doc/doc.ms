@@ -39,17 +39,17 @@ f sub DAC lineup > 2 cdot f sub m
 f sub BCLK lineup >= 2 cdot 16 cdot f sub DAC ~~~~ roman "with 16\ bit audio data"
 .EN
 .NH
-Theory of operation
-.NH 2
 Downsampling to I/Q base-band
 .LP
-The I/Q modulator works with 1-bit signals \*- for ADC input and for
-the modulation signal.
-The multiply operation is performed by a simple XOR logic.
+The I/Q modulator works with 1-bit signals.
+The upper two bits of the DDS's phase accumulator represent the
+quadrant.
 .LP
-As a result, the base-band signal is a triangular wave instead of a
-sine which will lead to harmonic distorsion.
-.NH 2
+The multiply operation is performed by a simple XOR logic.
+As a result, the I/Q base-band signal are triangular waves instead of
+pure sines/cosines which will lead to harmonic distortions of
+$4 cdot Delta f$.
+.NH
 Base-band filter
 .LP
 The base-band filter is compromised of two third order cascaded
@@ -61,7 +61,19 @@ factor of the CIC filter.
 .LP
 The base-band bandwith should be larger than $B$.
 For optimal channel separation it should be less than 400\ kHz.
-.NH 2
+.NH
+Frequency discriminator
+.LP
+The I/Q base-band signal is connected to the CORDIC module which will
+calculate the phase.
+.EQ
+theta = arc tan Q over I
+.EN
+After differentiation of the phase the signal is restored.
+.EQ
+omega sub m = { d theta } over { d t }
+.EN
+.NH
 Downsampling to audio sample rate
 .LP
 A third order CIC decimator converts from base-band sample rate to
@@ -70,7 +82,7 @@ This effectively removes any frequencies above 15\ kHz, e.g. MPX
 and RDS signals.
 Because no sinc-correction has been made yet, the transfer function
 will drop at higher audio frequencies.
-.NH 2
+.NH
 De-emphasis
 .LP
 A de-emphasis filter with the transfer function
@@ -89,6 +101,34 @@ a lineup = - e sup {- ^ {1 over {tau cdot f sub DAC}}}
 .EQ
 b lineup = 1 + a
 .EN
+.NH
+Audio interface
+.LP
+The Altera\ DE1 board contains the audio CODEC WM8731 from Wolfson
+Microelectronics.
+.LP
+After reset the CODEC will be initialized via I²C two-wire interface
+to 12\ MHz MCLK, 32\ kHz sampling rate, 16\ bit audio data length and
+DSP/PCM mode\ B.
+.TS
+center allbox tab(;);
+cb cb cb cb
+c  l  c l.
+register ; name ; data ; comment
+R0  ; Left Line In                   ; 000000000 ; 
+R1  ; Right Line In                  ; 000000000 ; 
+R2  ; Left Headphone Out             ; 000000000 ; LRHP BOTH = 1, LHPVOL = ???
+R3  ; Right Headphone Out            ; 000000000 ; RLHP BOTH = 0, RHPVOL = ???
+R4  ; Analogue Audio Path Control    ; 000000000 ; DACSEL = 1,
+R5  ; Digital Audio Path Control     ; 000000000 ;
+R6  ; Power Down Control             ; 000000000 ; 
+R7  ; Digital Audio Interface Format ; 000000000 ; 
+R8  ; Sampling Control               ; 000000000 ; 
+R9  ; Active Control                 ; 000000000 ; 
+R15 ; Reset Register                 ;           ; 
+.TE
+Serial audio data is transferred with the signals BCLK, DACDAT and
+DACLRC.
 .\" Local Variables:
 .\" coding: iso-latin-1
 .\" End:
