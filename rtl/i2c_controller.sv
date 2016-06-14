@@ -63,33 +63,33 @@ module i2c_controller
             next = A6;
          end
 
-       A6   : begin SDA = addr[6];    next = A5;   end
-       A5   : begin SDA = addr[5];    next = A4;   end
-       A4   : begin SDA = addr[4];    next = A3;   end
-       A3   : begin SDA = addr[3];    next = A2;   end
-       A2   : begin SDA = addr[2];    next = A1;   end
-       A1   : begin SDA = addr[1];    next = A0;   end
-       A0   : begin SDA = addr[0];    next = RW;   end
-       RW   : begin SDA = 1'b0;       next = ACK0; end
-       ACK0 : begin SDA = 1'b1;       next = D15;  end
-       D15  : begin SDA = wdata[1][7] next = D14   end
-       D14  : begin SDA = wdata[1][6] next = D13   end
-       D13  : begin SDA = wdata[1][5] next = D12   end
-       D12  : begin SDA = wdata[1][4] next = D11   end
-       D11  : begin SDA = wdata[1][3] next = D10   end
-       D10  : begin SDA = wdata[1][2] next = D9;   end
-       D9   : begin SDA = wdata[1][1] next = D8;   end
-       D8   : begin SDA = wdata[1][0] next = ACK1; end
-       ACK1 : begin SDA = 1'b1;       next = D7;   end
-       D7   : begin SDA = wdata[0][7] next = D6;   end
-       D6   : begin SDA = wdata[0][6] next = D5;   end
-       D5   : begin SDA = wdata[0][5] next = D4;   end
-       D4   : begin SDA = wdata[0][4] next = D3;   end
-       D3   : begin SDA = wdata[0][3] next = D2;   end
-       D2   : begin SDA = wdata[0][2] next = D1;   end
-       D1   : begin SDA = wdata[0][1] next = D0;   end
-       D0   : begin SDA = wdata[0][0] next = ACK2; end
-       ACK2 : begin SDA = 1'b1;       next = STOP; end
+       A6   : begin SDA = addr[6];     next = A5;   end
+       A5   : begin SDA = addr[5];     next = A4;   end
+       A4   : begin SDA = addr[4];     next = A3;   end
+       A3   : begin SDA = addr[3];     next = A2;   end
+       A2   : begin SDA = addr[2];     next = A1;   end
+       A1   : begin SDA = addr[1];     next = A0;   end
+       A0   : begin SDA = addr[0];     next = RW;   end
+       RW   : begin SDA = 1'b0;        next = ACK0; end
+       ACK0 : begin SDA = 1'b1;        next = D15;  end
+       D15  : begin SDA = wdata[1][7]; next = D14   end
+       D14  : begin SDA = wdata[1][6]; next = D13   end
+       D13  : begin SDA = wdata[1][5]; next = D12   end
+       D12  : begin SDA = wdata[1][4]; next = D11   end
+       D11  : begin SDA = wdata[1][3]; next = D10   end
+       D10  : begin SDA = wdata[1][2]; next = D9;   end
+       D9   : begin SDA = wdata[1][1]; next = D8;   end
+       D8   : begin SDA = wdata[1][0]; next = ACK1; end
+       ACK1 : begin SDA = 1'b1;        next = D7;   end
+       D7   : begin SDA = wdata[0][7]; next = D6;   end
+       D6   : begin SDA = wdata[0][6]; next = D5;   end
+       D5   : begin SDA = wdata[0][5]; next = D4;   end
+       D4   : begin SDA = wdata[0][4]; next = D3;   end
+       D3   : begin SDA = wdata[0][3]; next = D2;   end
+       D2   : begin SDA = wdata[0][2]; next = D1;   end
+       D1   : begin SDA = wdata[0][1]; next = D0;   end
+       D0   : begin SDA = wdata[0][0]; next = ACK2; end
+       ACK2 : begin SDA = 1'b1;        next = STOP; end
 
        STOP:
          begin
