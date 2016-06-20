@@ -115,17 +115,17 @@ center allbox tab(;);
 cb cb cb cb
 c  l  c l.
 register ; name ; data ; comment
-R0  ; Left Line In                   ; 000000000 ; 
-R1  ; Right Line In                  ; 000000000 ; 
-R2  ; Left Headphone Out             ; 000000000 ; LRHP BOTH = 1, LHPVOL = ???
-R3  ; Right Headphone Out            ; 000000000 ; RLHP BOTH = 0, RHPVOL = ???
-R4  ; Analogue Audio Path Control    ; 000000000 ; DACSEL = 1,
-R5  ; Digital Audio Path Control     ; 000000000 ;
-R6  ; Power Down Control             ; 000000000 ; 
-R7  ; Digital Audio Interface Format ; 000000000 ; 
-R8  ; Sampling Control               ; 000000000 ; 
-R9  ; Active Control                 ; 000000000 ; 
-R15 ; Reset Register                 ;           ; 
+R0  ; Left Line In                   ; 010010111 ; default
+R1  ; Right Line In                  ; 010010111 ; default
+R2  ; Left Headphone Out             ; 101111001 ; LRHPBOTH, LHPVOL = 0\ dB
+R3  ; Right Headphone Out            ; 001111001 ; RHPVOL = 0\ dB
+R4  ; Analogue Audio Path Control    ; 000010000 ; DACSEL
+R5  ; Digital Audio Path Control     ; 000001000 ; default
+R6  ; Power Down Control             ; 000010111 ; POWEROFF = 0, DACPD = 0
+R7  ; Digital Audio Interface Format ; 000000011 ; IWL = 16\ bits, FORMAT = DSP\ mode
+R8  ; Sampling Control               ; 000000001 ; USB mode
+R9  ; Active Control                 ; 000000001 ; ACTIVE
+R15 ; Reset Register                 ; \(em      ; reset when written with zeros
 .TE
 Serial audio data is transferred with the signals BCLK, DACDAT and
 DACLRC.
