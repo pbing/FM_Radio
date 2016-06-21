@@ -46,6 +46,7 @@ module tb_i2c_controller;
              wdata = $random;
              req   = 1'b1;
 
+             while (en) @(posedge clk);
              while (!en) @(posedge clk);
              req = 1'b0;
 
