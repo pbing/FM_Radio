@@ -1,13 +1,5 @@
 /* I²C Controller (write only) */
 
-/*
- counter 00000123012301230123...01230123
- state   IIIISSSS666655554444...AAAAPPPP
- req     LLLHL...
- SCL     11111110011001100110...01100011
- SDA     11111100666655554444...aaaa0111
- */
-
 module i2c_controller
   (input  wire            reset, // reset
    input  wire            clk,   // clock
@@ -19,25 +11,61 @@ module i2c_controller
    output logic           SCL,   // I2C clock
    output logic           SDA);  // I2C data
 
-   logic [1:0] counter;
-   enum int unsigned {IDLE, START, A[7], RW, ACK[3], D[16], STOP} state, next;
+   localparam nbits = 1 + 3 * (8 + 1) + 1; // start bit + 3 * (8 bit data + 1 bit ack) + stop bit
+
+   logic [1:0]                   phase;       // bit phase
+   logic [$clog2(nbits) - 1 : 0] bit_counter; // bit counter
+   logic [nbits - 1 : 0]         shift;       // shift register
+   logic                         load;        // load shift register
+
+   enum int unsigned {IDLE, START, SHIFT, STOP} state, next; // FSM
+
+   /* shift register */
+   always_ff @(posedge clk or posedge reset)
+     if (reset)
+       shift <= '1;
+     else
+       if (en)
+         if (load)
+           shift <= {1'b0,     // start bit
+                     addr,     // addr
+                     1'b0,     // R/nW = write
+                     1'b1,     // ack
+                     wdata[1], // 1st data byte
+                     1'b1,     // ack
+                     wdata[0], // 2nd data byte
+                     1'b1,     // ack
+                     1'b0};    // stop bit
+         else
+           if (state != IDLE && phase == 2'd3)
+             shift <= {shift[$left(shift) - 1 : 0], 1'b1};
+
+   /* SDA is a registered output in order to avoid hazards which could
+    * be possible START/STOP events when SCL is 1'b1.
+    */
+   assign SDA = shift[$left(shift)];
+
+   /* bit phase */
+   always_ff @(posedge clk or posedge reset)
+     if (reset)
+       phase <= 2'd0;
+     else
+       if (en)
+         if (state == IDLE)
+           phase <= 2'd0;
+         else
+           phase <= phase + 2'd1;
 
    /* bit counter */
    always_ff @(posedge clk or posedge reset)
      if (reset)
-       counter <= 2'd0;
+       bit_counter <= 0;
      else
-       if (en)
-         if (state == IDLE)
-           counter <= 2'd0;
-         else
-           /* Gray coded */
-           case (counter)
-             2'd0: counter <= 2'd1;
-             2'd1: counter <= 2'd3;
-             2'd3: counter <= 2'd2;
-             2'd2: counter <= 2'd0;
-           endcase
+       if (load)
+         bit_counter <= 0;
+       else
+         if (en && phase == 2'd3)
+           bit_counter <= bit_counter + 1;
 
    /* FSM */
    always_ff @(posedge clk or posedge reset)
@@ -49,86 +77,51 @@ module i2c_controller
 
    always_comb
      begin
+        load = 1'b0;
         ack  = 1'b0;
         next = state;
 
         case (state)
           IDLE:
-            begin
-               SDA = 1'b1;
-
-               if (req)
-                 next = START;
-               else
-                 next = IDLE;
-            end
+            if (req)
+              next = START;
+            else
+              next = IDLE;
 
           START:
-            begin
-               if (counter == 2'd3 || counter == 2'd2)
-                 SDA = 1'b0;
-               else
-                 SDA = 1'b1;
+            if (phase == 2'd3)
+              begin
+                 load = 1'b1;
+                 next = SHIFT;
+              end
 
-               if (counter == 2'd2) next = A6;
-            end
-
-          A6   : begin SDA = addr[6];     if (counter == 2'd2) next = A5;   end
-          A5   : begin SDA = addr[5];     if (counter == 2'd2) next = A4;   end
-          A4   : begin SDA = addr[4];     if (counter == 2'd2) next = A3;   end
-          A3   : begin SDA = addr[3];     if (counter == 2'd2) next = A2;   end
-          A2   : begin SDA = addr[2];     if (counter == 2'd2) next = A1;   end
-          A1   : begin SDA = addr[1];     if (counter == 2'd2) next = A0;   end
-          A0   : begin SDA = addr[0];     if (counter == 2'd2) next = RW;   end
-          RW   : begin SDA = 1'b0;        if (counter == 2'd2) next = ACK0; end
-          ACK0 : begin SDA = 1'b1;        if (counter == 2'd2) next = D15;  end
-          D15  : begin SDA = wdata[1][7]; if (counter == 2'd2) next = D14;  end
-          D14  : begin SDA = wdata[1][6]; if (counter == 2'd2) next = D13;  end
-          D13  : begin SDA = wdata[1][5]; if (counter == 2'd2) next = D12;  end
-          D12  : begin SDA = wdata[1][4]; if (counter == 2'd2) next = D11;  end
-          D11  : begin SDA = wdata[1][3]; if (counter == 2'd2) next = D10;  end
-          D10  : begin SDA = wdata[1][2]; if (counter == 2'd2) next = D9;   end
-          D9   : begin SDA = wdata[1][1]; if (counter == 2'd2) next = D8;   end
-          D8   : begin SDA = wdata[1][0]; if (counter == 2'd2) next = ACK1; end
-          ACK1 : begin SDA = 1'b1;        if (counter == 2'd2) next = D7;   end
-          D7   : begin SDA = wdata[0][7]; if (counter == 2'd2) next = D6;   end
-          D6   : begin SDA = wdata[0][6]; if (counter == 2'd2) next = D5;   end
-          D5   : begin SDA = wdata[0][5]; if (counter == 2'd2) next = D4;   end
-          D4   : begin SDA = wdata[0][4]; if (counter == 2'd2) next = D3;   end
-          D3   : begin SDA = wdata[0][3]; if (counter == 2'd2) next = D2;   end
-          D2   : begin SDA = wdata[0][2]; if (counter == 2'd2) next = D1;   end
-          D1   : begin SDA = wdata[0][1]; if (counter == 2'd2) next = D0;   end
-          D0   : begin SDA = wdata[0][0]; if (counter == 2'd2) next = ACK2; end
-          ACK2 : begin SDA = 1'b1;        if (counter == 2'd2) next = STOP; end
+          SHIFT:
+            if (bit_counter == nbits - 2 && phase == 2'd3)
+              next = STOP;
 
           STOP:
-            begin
-               if (counter == 2'd0 || counter == 2'd1)
-                 SDA = 1'b0;
-               else
-                 SDA = 1'b1;
-
-               if (counter == 2'd2)
-                 begin
-                    ack  = 1'b1;
-                    next = IDLE;
-                 end
-            end
+            if (phase == 2'd3)
+              begin
+                 ack  = 1'b1;
+                 next = IDLE;
+              end
         endcase
      end
 
-   /* SCL generator */
+   /* SCL generator
+    * It is a registered output in order to avoid hazards.
+    */
    always_ff @(posedge clk or posedge reset)
      if (reset)
        SCL <= 1'b1;
      else
        if (en)
          case (state)
-           IDLE, STOP:
+           IDLE, START, STOP:
              SCL <= 1'b1;
 
            default
-             if (counter == 2'd3 || counter == 2'd2)
+             if (phase == 2'd2 || phase == 2'd3)
                SCL <= 1'b0;
              else
                SCL <= 1'b1;
