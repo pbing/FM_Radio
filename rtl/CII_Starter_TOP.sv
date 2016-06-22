@@ -71,7 +71,7 @@ module CII_Starter_TOP
 
    /* I2C */
    inout  wire        I2C_SDAT,    // I2C Data
-   output wire        I2C_SCLK,    // I2C Clock
+   inout  wire        I2C_SCLK,    // I2C Clock
 
    /* PS2 */
    input  wire        PS2_DAT,     // PS2 Data
@@ -115,10 +115,20 @@ module CII_Starter_TOP
    wire [15:0]              audio_dat;              // audio data
    wire [15:0]              radio_core_demodulated; // radio_core demodulated audio data
    wire [15:0]              test_tone_data;         // 1 kHz test tone audio data
+   wire                     i2c_scl, i2c_sda;       // I2C interface
+
+   /* open-drain outputs for I2C */
+   assign I2C_SCLK = (i2c_scl) ? 1'bz : 1'b0;
+   assign I2C_SDAT = (i2c_sda) ? 1'bz : 1'b0;
+
+   assign GPIO_0[34] = I2C_SCLK;
+   assign GPIO_0[35] = I2C_SDAT;
 
    assign reset_in = ~KEY[0];
 
    assign audio_dat = (SW[9]) ? test_tone_data : radio_core_demodulated;
+
+   assign AUD_ADCLRCK = 1'b0;
 
    pll inst_pll
      (.inclk0(CLOCK_24[0]),
@@ -141,9 +151,9 @@ module CII_Starter_TOP
    inst_radio_core
      (.reset        (reset_sync),
       .clk          (clk240m),
-      .en1          (en48m),
-      .en_b         (en960k),
-      .en_a         (en32k),
+      .en48m,
+      .en960k,
+      .en32k,
       .adc          (GPIO_0[0]), // FIXME
       .K,
       .demodulated  (radio_core_demodulated));
@@ -159,17 +169,18 @@ module CII_Starter_TOP
      (.reset(reset_sync),
       .clk       (clk240m),
       .en48m,
+      .en1m6,
       .en32k,
       .audio_dat,
-      .i2c_scl  (I2C_SCLK),
-      .i2c_sda  (I2C_SDAT),
+      .i2c_scl,
+      .i2c_sda,
       .dac_lr_ck(AUD_DACLRCK),
       .dac_dat  (AUD_DACDAT),
       .bclk     (AUD_BCLK),
       .mclk     (AUD_XCK));
 
    test_tone inst_test_tone
-     (.reset(reset_synch),
+     (.reset(reset_sync),
       .clk  (clk240m),
       .en   (en32k),
       .data (test_tone_data));

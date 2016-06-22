@@ -8,7 +8,7 @@ module wm8731_serializer
    input  wire  [15:0] audio_dat, // audio data
    output logic        dac_lr_ck, // DAC L/R clock
    output wire         dac_dat,   // DAC data
-   output logic        bclk,      // 1.024 MHz BCLK
+   output logic        bclk,      //  2 MHz BCLK
    output logic        mclk);     // 12 MHz MCLK
 
    logic                en_bclk2, en_bclk;

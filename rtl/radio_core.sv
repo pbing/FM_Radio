@@ -7,9 +7,9 @@ module radio_core
     parameter R2           = 30)                            // broad-band to audio frequency ratio
    (input  wire                             reset,          // reset
     input  wire                             clk,            // clock
-    input  wire                             en1,            //  48 MHz first CIC filter clock enable
-    input  wire                             en_b,           // 960 kHz base-band clock enable
-    input  wire                             en_a,           //  32 kHz audio clock enable
+    input  wire                             en48m,          //  48 MHz first CIC filter clock enable
+    input  wire                             en960k,         // 960 kHz base-band clock enable
+    input  wire                             en32k,          //  32 kHz audio clock enable
     input  wire                             adc,            // broadcast signal from 1-bit ADC
     input  wire        [width_dds - 1:0]    K,              // phase constant for DDS
     output wire signed [15:0]               demodulated);   // demodulated signal
@@ -68,7 +68,7 @@ module radio_core
      (.reset,
       .clk   (clk),
       .en_in (1'b1),
-      .en_out(en1),
+      .en_out(en48m),
       .in    (I),
       .out   (If1));
 
@@ -79,7 +79,7 @@ module radio_core
      (.reset,
       .clk   (clk),
       .en_in (1'b1),
-      .en_out(en1),
+      .en_out(en48m),
       .in    (Q),
       .out   (Qf1));
 
@@ -90,8 +90,8 @@ module radio_core
    filter_I2
      (.reset,
       .clk   (clk),
-      .en_in (en1),
-      .en_out(en_b),
+      .en_in (en48m),
+      .en_out(en960k),
       .in    (If1),
       .out   (If2));
 
@@ -101,8 +101,8 @@ module radio_core
    filter_Q2
      (.reset,
       .clk   (clk),
-      .en_in (en1),
-      .en_out(en_b),
+      .en_in (en48m),
+      .en_out(en960k),
       .in    (Qf1),
       .out   (Qf2));
 
@@ -120,7 +120,7 @@ module radio_core
    inst_cordic
      (.reset,
       .clk(clk),
-      .en(en_b),
+      .en(en960k),
       .x0 (If2[$left(If2) - 1 -: width_cordic]),
       .y0 (Qf2[$left(Qf2) - 1 -: width_cordic]),
       .z0 ('0),
@@ -133,7 +133,7 @@ module radio_core
    inst_differentiator
      (.reset,
       .clk(clk),
-      .en(en_b),
+      .en(en960k),
       .in(cordic_phase),
       .out(differentiator_out));
 
@@ -147,8 +147,8 @@ module radio_core
    filter_audio
      (.reset,
       .clk   (clk),
-      .en_in (en_b),
-      .en_out(en_a),
+      .en_in (en960k),
+      .en_out(en32k),
       .in    (differentiator_out),
       .out   (demodulated_f));
 
