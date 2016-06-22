@@ -13,10 +13,11 @@ module i2c_controller
 
    localparam nbits = 1 + 3 * (8 + 1) + 1; // start bit + 3 * (8 bit data + 1 bit ack) + stop bit
 
-   logic [1:0]                   phase;       // bit phase
-   logic [$clog2(nbits) - 1 : 0] bit_counter; // bit counter
-   logic [nbits - 1 : 0]         shift;       // shift register
-   logic                         load;        // load shift register
+   logic [1:0]                   phase;          // bit phase 
+   logic                         phase2, phase3; // bit phase 2 and 3
+   logic [$clog2(nbits) - 1 : 0] bit_counter;    // bit counter
+   logic [nbits - 1 : 0]         shift;          // shift register
+   logic                         load;           // load shift register
 
    enum int unsigned {IDLE, START, SHIFT, STOP} state, next; // FSM
 
@@ -37,7 +38,7 @@ module i2c_controller
                      1'b1,     // ack
                      1'b0};    // stop bit
          else
-           if (state != IDLE && phase == 2'd3)
+           if (state != IDLE && phase3)
              shift <= {shift[$left(shift) - 1 : 0], 1'b1};
 
    /* SDA is a registered output in order to avoid hazards which could
@@ -56,6 +57,12 @@ module i2c_controller
          else
            phase <= phase + 2'd1;
 
+   always_comb
+     begin
+        phase2 = (phase == 2'd2);
+        phase3 = (phase == 2'd3);
+     end
+
    /* bit counter */
    always_ff @(posedge clk or posedge reset)
      if (reset)
@@ -64,7 +71,7 @@ module i2c_controller
        if (load)
          bit_counter <= 0;
        else
-         if (en && phase == 2'd3)
+         if (en && phase3)
            bit_counter <= bit_counter + 1;
 
    /* FSM */
@@ -89,18 +96,18 @@ module i2c_controller
               next = IDLE;
 
           START:
-            if (phase == 2'd3)
+            if (phase3)
               begin
                  load = 1'b1;
                  next = SHIFT;
               end
 
           SHIFT:
-            if (bit_counter == nbits - 2 && phase == 2'd3)
+            if (bit_counter == nbits - 2 && phase3)
               next = STOP;
 
           STOP:
-            if (phase == 2'd3)
+            if (phase3)
               begin
                  ack  = 1'b1;
                  next = IDLE;
@@ -121,7 +128,7 @@ module i2c_controller
              SCL <= 1'b1;
 
            default
-             if (phase == 2'd2 || phase == 2'd3)
+             if (phase2 || phase3)
                SCL <= 1'b0;
              else
                SCL <= 1'b1;
