@@ -13,22 +13,22 @@ module freq_select
             K = 2**32 * 87.7e6 / 240.0e6;  // SWR1
             hex_display('h0877);
          end
-       10'h1:
+       10'h2:
          begin
             K = 2**32 * 89.3e6 / 240.0e6;  // hr3
             hex_display('h0893);
          end
-       10'h2:
+       10'h4:
          begin
             K = 2**32 * 93.7e6 / 240.0e6;  // SWR3
             hex_display('h0937);
          end
-       10'h4:
+       10'h8:
          begin
             K = 2**32 * 98.1e6 / 240.0e6;  // RPR1
             hex_display('h0981);
          end
-       10'h8:
+       10'h10:
          begin
             K = 2**32 * 107.9e6 / 240.0e6; // Rockland Radio
             hex_display('h1079);
