@@ -1,6 +1,8 @@
 /* FPGA top level
  *
- * KEY[0] external reset
+ * KEY[0]  external reset
+ * SW[9]   apply 1 kHz test tone to DAC
+ * SW[4:0] select fixed frequency defined in 'freq_select'
  */
 
 module CII_Starter_TOP
@@ -102,16 +104,20 @@ module CII_Starter_TOP
 
    localparam width_dds = 32;
 
-   wire                     reset_in;   // power-on reset
-   wire                     reset_sync; // synchronized reset
-   wire                     clk240m;    // 240 MHz clock
-   wire                     en48m;      //  48 MHz clock enable
-   wire                     en960k;     // 960 kHz clock enable
-   wire                     en32k;      //  32 kHz clock enable
-   wire [width_dds - 1 : 0] K;          // DDS phase reload constant
-   wire [15:0]              audio_dat;  // audio data
+   wire                     reset_in;               // power-on reset
+   wire                     reset_sync;             // synchronized reset
+   wire                     clk240m;                // 240 MHz clock
+   wire                     en48m;                  //  48 MHz clock enable
+   wire                     en960k;                 // 960 kHz clock enable
+   wire                     en32k;                  //  32 kHz clock enable
+   wire [width_dds - 1 : 0] K;                      // DDS phase reload constant
+   wire [15:0]              audio_dat;              // audio data
+   wire [15:0]              radio_core_demodulated; // radio_core demodulated audio data
+   wire [15:0]              test_tone_data;         // 1 kHz test tone audio data
 
    assign reset_in = ~KEY[0];
+
+   assign audio_dat = (SW[9]) ? test_tone_data : radio_core_demodulated;
 
    pll inst_pll
      (.inclk0(CLOCK_24[0]),
@@ -120,7 +126,7 @@ module CII_Starter_TOP
    cru inst_cru
      (.reset_in,
       .reset_sync,
-      .clk_240m,
+      .clk240m,
       .en48m,
       .en960k,
       .en32k);
@@ -138,7 +144,7 @@ module CII_Starter_TOP
       .en_a         (en32k),
       .adc          (GPIO_0[0]), // FIXME
       .K,
-      .demodulated  (audio_dat));
+      .demodulated  (radio_core_demodulated));
 
    freq_select
      #(.width_dds(width_dds))
@@ -153,10 +159,16 @@ module CII_Starter_TOP
       .en48m,
       .en32k,
       .audio_dat,
-      .i2c_scl   (I2C_SCLK),
-      .i2c_sda   (I2C_SDAT),
-      .dac_lr_clk(AUD_DACLRCK),
-      .dac_dat   (AUD_DACDAT),
-      .bclk      (AUD_BCLK),
-      .mclk      (AUD_XCK));
+      .i2c_scl  (I2C_SCLK),
+      .i2c_sda  (I2C_SDAT),
+      .dac_lr_ck(AUD_DACLRCK),
+      .dac_dat  (AUD_DACDAT),
+      .bclk     (AUD_BCLK),
+      .mclk     (AUD_XCK));
+
+   test_tone inst_test_tone
+     (.reset(reset_synch),
+      .clk  (clk240m),
+      .en   (en32k),
+      .data (test_tone_data));
 endmodule
