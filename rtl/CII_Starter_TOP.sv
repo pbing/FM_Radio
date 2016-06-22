@@ -108,6 +108,7 @@ module CII_Starter_TOP
    wire                     reset_sync;             // synchronized reset
    wire                     clk240m;                // 240 MHz clock
    wire                     en48m;                  //  48 MHz clock enable
+   wire                     en1m6;                  // 1.6 MHz clock enable
    wire                     en960k;                 // 960 kHz clock enable
    wire                     en32k;                  //  32 kHz clock enable
    wire [width_dds - 1 : 0] K;                      // DDS phase reload constant
@@ -128,6 +129,7 @@ module CII_Starter_TOP
       .reset_sync,
       .clk240m,
       .en48m,
+      .en1m6,
       .en960k,
       .en32k);
 
