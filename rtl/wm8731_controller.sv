@@ -13,11 +13,22 @@ module wm8731_controller
    output wire        bclk,      // 1.024 MHz BCLK
    output wire        mclk);     // 12 MHz MCLK
 
+   wire            en1m6; // 1.6 MHz = 4 * 400 kHz
+   wire [6:0]      addr;  // address
+   wire [1:0][7:0] wdata; // write data
+   wire            req;   // request
+   wire            ack;   // acknowledge
+   
    wm8731_i2c_controller inst_i2c_controller
      (.reset,
       .clk,
-      .i2c_scl,
-      .i2c_sda);
+      .en(en1m6),
+      .addr,
+      .wdata,
+      .req,
+      .ack,
+      .SCL(i2c_scl),
+      .SDA(i2c_sda));
 
    wm8731_serializer inst_serializer
      (.reset,
