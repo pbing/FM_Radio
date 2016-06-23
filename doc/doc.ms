@@ -95,13 +95,13 @@ corrects the pre-emphased audio signal of the broadcast station.
 .LP
 Impulse invariance method converts $H(s)$ to $H(z)$.
 .EQ
-H(z) mark = b over {1 + a cdot z sup {-1}}
+H(z) mark = {b sub 0} over {1 + a sub 1 cdot z sup {-1}}
 .EN
 .EQ
-a lineup = - e sup {- ^ {1 over {tau cdot f sub DAC}}}
+a sub 1 lineup = - e sup {- ^ {1 over {tau cdot f sub DAC}}}
 .EN
 .EQ
-b lineup = 1 + a
+b sub 0 lineup = 1 + a sub 1
 .EN
 .NH 2
 De-emphasis with build-in filter of the WM8731
@@ -111,9 +111,9 @@ The analogue transfer function is
 .EQ
 H(s) = {1 + tau sub 2 cdot s} over {1 + tau sub 1 cdot s}
 .EN
-with $tau sub 1 = 50~탎$ and $tau sub 2 = 15~탎$.
-The zero at $10.6~kHz$ partly compensates the \fIsinc\fP drop of the
-CIC decimation filter.
+with $tau sub 1 = 50~roman 탎$ and $tau sub 2 = 15~roman 탎$.
+The zero at 10.6\ kHz partly compensates the \fIsinc\fP drop caused by
+the CIC decimation filter.
 .NH
 Audio interface
 .LP
