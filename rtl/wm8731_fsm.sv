@@ -16,7 +16,7 @@ module wm8731_fsm
                                {7'd3,  9'b0_0_1111001},       // Right Headphone Out
                                {7'd4,  9'b0_00_0_1_0_0_1_0},  // Analogue Audio Path Control
                                {7'd5,  9'b0000_0_0_01_0},     // Digital Audio Path Control
-                               {7'd6,  9'b0_0_0_0_0_0_0_0_0}, // Power Down Control
+                               {7'd6,  9'b0_0_1_1_0_0_1_1_1}, // Power Down Control
                                {7'd7,  9'b0_0_0_0_0_00_11},   // Digital Audio Interface Format
                                {7'd8,  9'b0_0_0_0110_0_1},    // Sampling Control
                                {7'd9,  9'b00000000_1}};       // Active Control
