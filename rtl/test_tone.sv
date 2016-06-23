@@ -8,7 +8,7 @@ module test_tone
 
    localparam cordic_width = 17;                  // use the same atan()-table like in 'radio_core'
 
-   const bit [31:0] K = 2.0**32 * 1.0e3 / 32.0e3; // 1 kHz;
+   const bit [31:0] K = 2.0**32 * 12.25e3 / 32.0e3; // 1 kHz;
 
    wire signed [cordic_width - 1:0] x0, y0, z0;
    wire signed [cordic_width    :0] x;            // output (scaled with K=1.6467...)
