@@ -1,8 +1,9 @@
 /* FPGA top level
  *
- * KEY[0]  external reset
- * SW[9]   apply 1 kHz test tone to DAC
- * SW[4:0] select fixed frequency defined in 'freq_select'
+ * KEY[0]           external reset
+ * SW[9]            apply 1 kHz test tone to DAC
+ * SW[5:3, 1:0]     select fixed frequency defined in 'freq_select'
+ * EXT_CLOCK, SW[2] differential input for antenna signal
  */
 
 module CII_Starter_TOP
@@ -99,8 +100,7 @@ module CII_Starter_TOP
    output wire        AUD_XCK,     // Audio CODEC Chip Clock
 
    /* GPIO */
-   inout  wire [35:0] GPIO_0,      // GPIO Connection 0
-   inout  wire [35:0] GPIO_1);     // GPIO Connection 1
+   inout  wire [35:0] GPIO_0);     // GPIO Connection 0
 
    localparam width_dds = 32;
 
@@ -120,9 +120,6 @@ module CII_Starter_TOP
    /* open-drain outputs for I2C */
    assign I2C_SCLK = (i2c_scl) ? 1'bz : 1'b0;
    assign I2C_SDAT = (i2c_sda) ? 1'bz : 1'b0;
-
-   assign GPIO_0[34] = I2C_SCLK;
-   assign GPIO_0[35] = I2C_SDAT;
 
    assign reset_in = ~KEY[0];
 
@@ -154,7 +151,7 @@ module CII_Starter_TOP
       .en48m,
       .en960k,
       .en32k,
-      .adc          (GPIO_0[0]), // FIXME
+      .adc          (EXT_CLOCK),
       .K,
       .demodulated  (radio_core_demodulated));
 
