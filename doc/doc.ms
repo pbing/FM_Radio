@@ -142,6 +142,20 @@ R15 ; Reset                          ; \(em      ; reset, when written with zero
 .TE
 Serial audio data is transferred with the signals BCLK, DACDAT and
 DACLRC.
+.NH
+Antenna connection
+.LP
+For the antenna input an I/O input buffer without hysteresis is needed.
+A differential input of type LVECL at EXT_CLOCK/SW[2] was choosen.
+.LP
+The antenna (a wire of 1\ m length) was directly connected to EXT_CLOCK.
+No LC-circuit for tuning was needed.
+.NH
+Results
+.LP
+Three local broadcast stations could be received.
+The audio signal was of reasonable quality.
+If there were harmonic distorsions they were not very audible.
 .\" Local Variables:
 .\" coding: iso-latin-1
 .\" End:

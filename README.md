@@ -6,10 +6,12 @@ git clone https://github.com/pbing/FM_Radio.git
 cd FM_Radio
 git submodule update --init
 ```
-
 ## Status
 
-- Initial commit.
+- FPGA proven.
+
+## Used Parts
+- [Altera Cyclone II FPGA Starter Development Kit](http://www.terasic.com.tw/cgi-bin/page/archive.pl?Language=English&CategoryNo=53&No=83).
 
 ## Credits
 
